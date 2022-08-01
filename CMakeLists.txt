@@ -23,6 +23,7 @@ endmacro()
 
 option(BUILD_SHARED_LIBS "Build libraries as shared libraries" ON)
 cpr_option(CPR_ENABLE_SSL "Enables or disables the SSL backend. Required to perform HTTPS requests." ON)
+cpr_option(CPR_FORCE_OPENSSL_BACKEND "Enables or disables the SSL backend. Required to perform HTTPS requests." ON)
 
 include(GNUInstallDirs)
 include(FetchContent)
@@ -85,13 +86,14 @@ if(CPR_ENABLE_SSL)
         endif()
     else()
         if(CPR_FORCE_OPENSSL_BACKEND)
-            find_package(OpenSSL)
-            if(OPENSSL_FOUND)
-                message(STATUS "Using OpenSSL.")
-                set(SSL_BACKEND_USED "OpenSSL")
-            else()
-                message(FATAL_ERROR "CPR_FORCE_OPENSSL_BACKEND enabled but we were not able to find OpenSSL!")
-            endif()
+            __cc_find(OpenSSL)
+            #find_package(OpenSSL)
+            #if(OPENSSL_FOUND)
+            #    message(STATUS "Using OpenSSL.")
+            #    set(SSL_BACKEND_USED "OpenSSL")
+            #else()
+            #    message(FATAL_ERROR "CPR_FORCE_OPENSSL_BACKEND enabled but we were not able to find OpenSSL!")
+            #endif()
         elseif(CPR_FORCE_WINSSL_BACKEND)
             message(STATUS "Using WinSSL.")
             set(SSL_BACKEND_USED "WinSSL")
@@ -107,11 +109,11 @@ if(CPR_ENABLE_SSL)
     endif()
 endif()
 
-if(SSL_BACKEND_USED STREQUAL "OpenSSL")
-# Fix missing OpenSSL includes for Windows since in 'ssl_ctx.cpp' we include OpenSSL directly
-find_package(OpenSSL REQUIRED)
-    add_compile_definitions(OPENSSL_BACKEND_USED)
-endif()
+#if(SSL_BACKEND_USED STREQUAL "OpenSSL")
+## Fix missing OpenSSL includes for Windows since in 'ssl_ctx.cpp' we include OpenSSL directly
+#    find_package(OpenSSL REQUIRED)
+#    add_compile_definitions(OPENSSL_BACKEND_USED)
+#endif()
 
 __assert_target(curl)
 __assert_target(zlib)
@@ -185,6 +187,13 @@ set(SRCS
 		
 set(INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBS curl zlib)
+set(DEFS)
+
+if(TARGET ssl)
+    list(APPEND LIBS ssl)
+    list(APPEND DEFS OPENSSL_BACKEND_USED)
+endif()
+
 __add_real_target(cpr dll SOURCE ${SRCS}
 						  INC ${INCS}
 						  LIB ${LIBS}

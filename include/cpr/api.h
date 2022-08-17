@@ -53,6 +53,20 @@ void set_option(Session& session, Ts&&... ts) {
 
 } // namespace priv
 
+// FTP Put methods
+template <typename... Ts>
+Response FtpPut(const std::string& local_filepath, Ts&&... ts) {
+    Session session;
+    priv::set_option(session, std::forward<Ts>(ts)...);
+    return session.FtpPut(local_filepath);
+}
+
+// FTP Put async methods
+template <typename... Ts>
+AsyncResponse FtpPutAsync(const std::string& local_filepath, Ts... ts) {
+    return cpr::async([=](Ts... ts_inner) { return FtpPut(std::move(local_filepath), std::move(ts_inner)...); }, std::move(ts)...);
+}
+
 // Get methods
 template <typename... Ts>
 Response Get(Ts&&... ts) {

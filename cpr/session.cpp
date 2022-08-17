@@ -720,6 +720,78 @@ Response Session::Put() {
     return makeRequest();
 }
 
+#ifdef WIN32
+std::string AnsiToUtf8(const std::string& codepage_str) {
+    // Transcode Windows ANSI to UTF-16
+    int size = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, codepage_str.c_str(), codepage_str.length(), nullptr, 0);
+    std::wstring utf16_str(size, '\0');
+    MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, codepage_str.c_str(), codepage_str.length(), &utf16_str[0], size);
+
+    // Transcode UTF-16 to UTF-8
+    int utf8_size = WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(), utf16_str.length(), nullptr, 0, nullptr, nullptr);
+    std::string utf8_str(utf8_size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(), utf16_str.length(), &utf8_str[0], utf8_size, nullptr, nullptr);
+
+    return utf8_str;
+}
+
+std::wstring Utf8ToUtf16(const std::string& str) {
+    std::wstring ret;
+    int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    if (len > 0) {
+        ret.resize(len);
+        MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &ret[0], len);
+    }
+    return ret;
+}
+#endif
+
+Response Session::FtpPut(const std::string& local_filepath) {
+    FILE* hd_src;
+    struct stat file_info;
+    unsigned long fsize;
+
+    std::wstring srcName;
+#ifdef WIN32
+    srcName = Utf8ToUtf16(local_filepath);
+#else
+    srcName = local_filepath;
+#endif
+
+    struct curl_slist* headerlist = NULL;
+
+    _wfopen_s(&hd_src, srcName.c_str(), L"rb");
+    if (!hd_src)
+    {
+        return Response();
+    }
+    fseek(hd_src, 0, SEEK_END);
+    fsize = (long)ftell(hd_src);
+    fseek(hd_src, 0, SEEK_SET);
+    fs::path local_path(local_filepath);
+    std::string strRemoteFile = local_path.filename().string();
+    std::string tempName = (strRemoteFile + ".temp");
+    std::string buf_1 = "RNFR " + (tempName);
+    std::string buf_2 = "RNTO " + (strRemoteFile);
+    std::string url = url_.str() + tempName;
+    /* build a list of commands to pass to libcurl */
+    headerlist = curl_slist_append(headerlist, buf_1.c_str());
+    headerlist = curl_slist_append(headerlist, buf_2.c_str());
+
+    curl_easy_setopt(curl_->handle, CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(curl_->handle, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl_->handle, CURLOPT_POSTQUOTE, headerlist);
+    curl_easy_setopt(curl_->handle, CURLOPT_READDATA, hd_src);
+    curl_easy_setopt(curl_->handle, CURLOPT_INFILESIZE_LARGE,
+        (curl_off_t)fsize);
+
+    curl_easy_setopt(curl_->handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 1);
+
+    CURLcode curl_error = curl_easy_perform(curl_->handle);
+    curl_slist_free_all(headerlist);
+    return Complete(curl_error);
+}
+
 std::shared_ptr<Session> Session::GetSharedPtrFromThis() {
     try {
         return shared_from_this();
@@ -763,6 +835,10 @@ AsyncResponse Session::PostAsync() {
 
 AsyncResponse Session::PutAsync() {
     return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Put(); });
+}
+
+AsyncResponse Session::FtpPutAsync(const std::string& local_filepath) {
+    return async([shared_this = GetSharedPtrFromThis(), local_filepath]() { return shared_this->FtpPut(local_filepath); });
 }
 
 std::shared_ptr<CurlHolder> Session::GetCurlHolder() {

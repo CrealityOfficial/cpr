@@ -168,6 +168,7 @@ class Session : public std::enable_shared_from_this<Session> {
     Response Patch();
     Response Post();
     Response Put();
+    Response FtpPut(const std::string& local_filepath);
 
     AsyncResponse GetAsync();
     AsyncResponse DeleteAsync();
@@ -178,6 +179,7 @@ class Session : public std::enable_shared_from_this<Session> {
     AsyncResponse PatchAsync();
     AsyncResponse PostAsync();
     AsyncResponse PutAsync();
+    AsyncResponse FtpPutAsync(const std::string& local_filepath);
 
     template <typename Then>
     auto GetCallback(Then then);

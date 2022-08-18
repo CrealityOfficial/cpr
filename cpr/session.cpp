@@ -789,6 +789,16 @@ Response Session::FtpPut(const std::string& local_filepath) {
 
     CURLcode curl_error = curl_easy_perform(curl_->handle);
     curl_slist_free_all(headerlist);
+    fclose(hd_src);
+    return Complete(curl_error);
+}
+
+Response Session::FtpListFile(const std::string& filepath) {
+
+    curl_easy_setopt(curl_->handle, CURLOPT_URL, filepath.c_str());
+    curl_easy_setopt(curl_->handle, CURLOPT_DIRLISTONLY, 1L);
+
+    CURLcode curl_error = curl_easy_perform(curl_->handle);
     return Complete(curl_error);
 }
 
@@ -839,6 +849,10 @@ AsyncResponse Session::PutAsync() {
 
 AsyncResponse Session::FtpPutAsync(const std::string& local_filepath) {
     return async([shared_this = GetSharedPtrFromThis(), local_filepath]() { return shared_this->FtpPut(local_filepath); });
+}
+
+AsyncResponse Session::FtpListFileAsync(const std::string& filepath) {
+    return async([shared_this = GetSharedPtrFromThis(), filepath]() { return shared_this->FtpListFile(filepath); });
 }
 
 std::shared_ptr<CurlHolder> Session::GetCurlHolder() {

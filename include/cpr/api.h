@@ -63,8 +63,21 @@ Response FtpPut(const std::string& local_filepath, Ts&&... ts) {
 
 // FTP Put async methods
 template <typename... Ts>
-AsyncResponse FtpPutAsync(const std::string& local_filepath, Ts... ts) {
-    return cpr::async([=](Ts... ts_inner) { return FtpPut(std::move(local_filepath), std::move(ts_inner)...); }, std::move(ts)...);
+AsyncResponse FtpPutAsync(const std::string& filepath, Ts... ts) {
+    return cpr::async([=](Ts... ts_inner) { return FtpPut(filepath, std::move(ts_inner)...); }, std::move(ts)...);
+}
+
+template <typename... Ts>
+Response FtpListFile(const std::string& filepath, Ts&&... ts) {
+    Session session;
+    priv::set_option(session, std::forward<Ts>(ts)...);
+    return session.FtpListFile(filepath);
+}
+
+// FTP Put async methods
+template <typename... Ts>
+AsyncResponse FtpListFileAsync(const std::string& local_filepath, Ts... ts) {
+    return cpr::async([=](Ts... ts_inner) { return FtpListFile(local_filepath, std::move(ts_inner)...); }, std::move(ts)...);
 }
 
 // Get methods

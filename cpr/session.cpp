@@ -748,19 +748,20 @@ std::wstring Utf8ToUtf16(const std::string& str) {
 
 Response Session::FtpPut(const std::string& local_filepath) {
     FILE* hd_src;
-    struct stat file_info;
+    //struct stat file_info;
     unsigned long fsize;
 
     std::wstring srcName;
 #ifdef WIN32
     srcName = Utf8ToUtf16(local_filepath);
+    _wfopen_s(&hd_src, srcName.c_str(), L"rb");
 #else
-    srcName = local_filepath;
+    hd_src = fopen(local_filepath.c_str(),"rb");
 #endif
 
     struct curl_slist* headerlist = NULL;
 
-    _wfopen_s(&hd_src, srcName.c_str(), L"rb");
+
     if (!hd_src)
     {
         return Response();

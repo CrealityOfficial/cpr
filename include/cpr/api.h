@@ -67,6 +67,13 @@ AsyncResponse FtpPutAsync(const std::string& filepath, Ts... ts) {
     return cpr::async([=](Ts... ts_inner) { return FtpPut(filepath, std::move(ts_inner)...); }, std::move(ts)...);
 }
 
+// FTP Put callback methods
+template <typename Then, typename... Ts>
+// NOLINTNEXTLINE(fuchsia-trailing-return)
+auto FtpPutCallback(const std::string& filepath, Then then, Ts... ts) {
+    return cpr::async([=](Then then_inner, Ts... ts_inner) { return then_inner(FtpPut(filepath, std::move(ts_inner)...)); }, std::move(then), std::move(ts)...);
+}
+
 template <typename... Ts>
 Response FtpListFile(const std::string& filepath, Ts&&... ts) {
     Session session;

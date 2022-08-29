@@ -2,19 +2,15 @@
 #define CPR_RANGE_H
 
 #include <cstdint>
-#include <optional>
 
 namespace cpr {
 
 class Range {
   public:
-    Range(const std::optional<std::int64_t> p_resume_from = std::nullopt, const std::optional<std::int64_t> p_finish_at = std::nullopt) {
-        resume_from = p_resume_from.value_or(0);
-        finish_at = p_finish_at.value_or(-1);
-    }
+    Range(const std::int64_t p_resume_from, const std::int64_t p_finish_at) : resume_from(p_resume_from), finish_at(p_finish_at) {}
 
-    std::int64_t resume_from;
-    std::int64_t finish_at;
+    std::int64_t resume_from = 0;
+    std::int64_t finish_at = 0;
 
     const std::string str() const {
         std::string from_str = (resume_from < (std::int64_t) 0) ? "" : std::to_string(resume_from);

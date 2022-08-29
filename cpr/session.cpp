@@ -756,7 +756,7 @@ Response Session::FtpPut(const std::string& local_filepath) {
     srcName = Utf8ToUtf16(local_filepath);
     _wfopen_s(&hd_src, srcName.c_str(), L"rb");
 #else
-    hd_src = fopen(local_filepath.c_str(),"rb");
+    hd_src = fopen(local_filepath.c_str(), "rb");
 #endif
 
     struct curl_slist* headerlist = NULL;
@@ -769,8 +769,10 @@ Response Session::FtpPut(const std::string& local_filepath) {
     fseek(hd_src, 0, SEEK_END);
     fsize = (long)ftell(hd_src);
     fseek(hd_src, 0, SEEK_SET);
-    fs::path local_path(local_filepath);
-    std::string strRemoteFile = local_path.filename().string();
+    //fs::path local_path(local_filepath);
+    std::string strRemoteFile = "";// local_path.filename().string();
+    auto index = local_filepath.find_last_of('/');
+    strRemoteFile = local_filepath.substr(index+1);
     std::string tempName = (strRemoteFile + ".temp");
     std::string buf_1 = "RNFR " + (tempName);
     std::string buf_2 = "RNTO " + (strRemoteFile);
@@ -802,7 +804,6 @@ Response Session::FtpListFile(const std::string& filepath) {
     CURLcode curl_error = curl_easy_perform(curl_->handle);
     return Complete(curl_error);
 }
-
 std::shared_ptr<Session> Session::GetSharedPtrFromThis() {
     try {
         return shared_from_this();
@@ -817,43 +818,43 @@ AsyncResponse Session::GetAsync() {
 }
 
 AsyncResponse Session::DeleteAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Delete(); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Delete(); });
 }
 
 AsyncResponse Session::DownloadAsync(const WriteCallback& write) {
-    return async([shared_this = GetSharedPtrFromThis(), write]() { return shared_this->Download(write); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this, write]() { return shared_this->Download(write); });
 }
 
 AsyncResponse Session::DownloadAsync(std::ofstream& file) {
-    return async([shared_this = GetSharedPtrFromThis(), &file]() { return shared_this->Download(file); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this, &file]() { return shared_this->Download(file); });
 }
 
 AsyncResponse Session::HeadAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Head(); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Head(); });
 }
 
 AsyncResponse Session::OptionsAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Options(); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Options(); });
 }
 
 AsyncResponse Session::PatchAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Patch(); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Patch(); });
 }
 
 AsyncResponse Session::PostAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Post(); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Post(); });
 }
 
 AsyncResponse Session::PutAsync() {
-    return async([shared_this = GetSharedPtrFromThis()]() { return shared_this->Put(); });
-}
-
-AsyncResponse Session::FtpPutAsync(const std::string& local_filepath) {
-    return async([shared_this = GetSharedPtrFromThis(), local_filepath]() { return shared_this->FtpPut(local_filepath); });
-}
-
-AsyncResponse Session::FtpListFileAsync(const std::string& filepath) {
-    return async([shared_this = GetSharedPtrFromThis(), filepath]() { return shared_this->FtpListFile(filepath); });
+    auto shared_this = GetSharedPtrFromThis();
+    return async([shared_this]() { return shared_this->Put(); });
 }
 
 std::shared_ptr<CurlHolder> Session::GetCurlHolder() {

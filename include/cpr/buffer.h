@@ -3,15 +3,13 @@
 
 #include <string>
 
-#include <cpr/filesystem.h>
-
 namespace cpr {
 
 struct Buffer {
     using data_t = const unsigned char*;
 
     template <typename Iterator>
-    Buffer(Iterator begin, Iterator end, fs::path&& p_filename)
+    Buffer(Iterator begin, Iterator end, std::string&& p_filename)
             // Ignored here since libcurl reqires a long.
             // There is also no way around the reinterpret_cast.
             // NOLINTNEXTLINE(google-runtime-int, cppcoreguidelines-pro-type-reinterpret-cast)
@@ -27,7 +25,7 @@ struct Buffer {
     // Ignored here since libcurl reqires a long:
     // NOLINTNEXTLINE(google-runtime-int)
     long datalen;
-    const fs::path filename;
+    const std::string filename;
 };
 
 } // namespace cpr

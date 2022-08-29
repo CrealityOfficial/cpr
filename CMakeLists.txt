@@ -1,4 +1,4 @@
-__enable_cxx17()
+# __enable_cxx17()
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 set(cpr_VERSION_MAJOR 1)
@@ -181,7 +181,6 @@ set(SRCS
 		include/cpr/redirect.h
 		include/cpr/http_version.h
 		include/cpr/interceptor.h
-		include/cpr/filesystem.h
 		${CMAKE_CURRENT_BINARY_DIR}/cpr/cprver.h
 		)
 		

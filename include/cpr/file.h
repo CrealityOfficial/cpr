@@ -3,14 +3,12 @@
 
 #include <string>
 
-#include <cpr/filesystem.h>
-
 namespace cpr {
 
 struct File {
-    explicit File(fs::path&& p_filepath) : filepath(std::move(p_filepath)) {}
-    explicit File(const fs::path& p_filepath) : filepath(p_filepath) {}
-    const fs::path filepath;
+    explicit File(std::string&& p_filepath) : filepath(std::move(p_filepath)) {}
+    explicit File(const std::string& p_filepath) : filepath(p_filepath) {}
+    const std::string filepath;
 };
 
 } // namespace cpr

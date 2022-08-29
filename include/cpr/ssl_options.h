@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <cpr/filesystem.h>
 #include <curl/curl.h>
 
 #include "cpr/util.h"
@@ -91,11 +90,11 @@ namespace ssl {
 class CertFile {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    CertFile(fs::path&& p_filename) : filename(std::move(p_filename)) {}
+    CertFile(std::string&& p_filename) : filename(std::move(p_filename)) {}
 
     virtual ~CertFile() = default;
 
-    const fs::path filename;
+    const std::string filename;
 
     virtual const char* GetCertType() const {
         return "PEM";
@@ -107,7 +106,7 @@ using PemCert = CertFile;
 class DerCert : public CertFile {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    DerCert(fs::path&& p_filename) : CertFile(std::move(p_filename)) {}
+    DerCert(std::string&& p_filename) : CertFile(std::move(p_filename)) {}
 
     virtual ~DerCert() = default;
 
@@ -120,7 +119,7 @@ class DerCert : public CertFile {
 class KeyFile {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    KeyFile(fs::path&& p_filename) : filename(std::move(p_filename)) {}
+    KeyFile(std::string&& p_filename) : filename(std::move(p_filename)) {}
 
     template <typename FileType, typename PassType>
     KeyFile(FileType&& p_filename, PassType p_password) : filename(std::forward<FileType>(p_filename)), password(std::move(p_password)) {}
@@ -129,7 +128,7 @@ class KeyFile {
         util::secureStringClear(password);
     }
 
-    fs::path filename;
+    std::string filename;
     std::string password;
 
     virtual const char* GetKeyType() const {
@@ -164,7 +163,7 @@ using PemKey = KeyFile;
 class DerKey : public KeyFile {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    DerKey(fs::path&& p_filename) : KeyFile(std::move(p_filename)) {}
+    DerKey(std::string&& p_filename) : KeyFile(std::move(p_filename)) {}
 
     template <typename FileType, typename PassType>
     DerKey(FileType&& p_filename, PassType p_password) : KeyFile(std::forward<FileType>(p_filename), std::move(p_password)) {}
@@ -313,18 +312,18 @@ struct MaxTLSv1_3 {};
 class CaInfo {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    CaInfo(fs::path&& p_filename) : filename(std::move(p_filename)) {}
+    CaInfo(std::string&& p_filename) : filename(std::move(p_filename)) {}
 
-    fs::path filename;
+    std::string filename;
 };
 
 // specify directory holding CA certificates
 class CaPath {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    CaPath(fs::path&& p_filename) : filename(std::move(p_filename)) {}
+    CaPath(std::string&& p_filename) : filename(std::move(p_filename)) {}
 
-    fs::path filename;
+    std::string filename;
 };
 
 #if SUPPORT_CURLOPT_SSL_CTX_FUNCTION
@@ -341,9 +340,9 @@ class CaBuffer {
 class Crl {
   public:
     // NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
-    Crl(fs::path&& p_filename) : filename(std::move(p_filename)) {}
+    Crl(std::string&& p_filename) : filename(std::move(p_filename)) {}
 
-    fs::path filename;
+    std::string filename;
 };
 
 // specify ciphers to use for TLS
@@ -413,10 +412,8 @@ class NoRevoke {
 } // namespace ssl
 
 struct SslOptions {
-    // We don't use fs::path here, as this leads to problems using windows
     std::string cert_file;
     std::string cert_type;
-    // We don't use fs::path here, as this leads to problems using windows
     std::string key_file;
 #if SUPPORT_CURLOPT_SSLKEY_BLOB
     std::string key_blob;
@@ -440,14 +437,11 @@ struct SslOptions {
 #if SUPPORT_MAX_TLS_VERSION
     int max_version = CURL_SSLVERSION_MAX_DEFAULT;
 #endif
-    // We don't use fs::path here, as this leads to problems using windows
     std::string ca_info;
-    // We don't use fs::path here, as this leads to problems using windows
     std::string ca_path;
 #if SUPPORT_CURLOPT_SSL_CTX_FUNCTION
     std::string ca_buffer;
 #endif
-    // We don't use fs::path here, as this leads to problems using windows
     std::string crl_file;
     std::string ciphers;
 #if SUPPORT_TLSv13_CIPHERS
@@ -465,11 +459,11 @@ struct SslOptions {
     }
 
     void SetOption(const ssl::CertFile& opt) {
-        cert_file = opt.filename.string();
+        cert_file = opt.filename;
         cert_type = opt.GetCertType();
     }
     void SetOption(const ssl::KeyFile& opt) {
-        key_file = opt.filename.string();
+        key_file = opt.filename;
         key_type = opt.GetKeyType();
         key_pass = opt.password;
     }
@@ -567,10 +561,10 @@ struct SslOptions {
     }
 #endif
     void SetOption(const ssl::CaInfo& opt) {
-        ca_info = opt.filename.string();
+        ca_info = opt.filename;
     }
     void SetOption(const ssl::CaPath& opt) {
-        ca_path = opt.filename.string();
+        ca_path = opt.filename;
     }
 #if SUPPORT_CURLOPT_SSL_CTX_FUNCTION
     void SetOption(const ssl::CaBuffer& opt) {
@@ -578,7 +572,7 @@ struct SslOptions {
     }
 #endif
     void SetOption(const ssl::Crl& opt) {
-        crl_file = opt.filename.string();
+        crl_file = opt.filename;
     }
     void SetOption(const ssl::Ciphers& opt) {
         ciphers = opt.ciphers;

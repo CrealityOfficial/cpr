@@ -162,6 +162,7 @@ class Session : public std::enable_shared_from_this<Session> {
     Response Delete();
     Response Download(const WriteCallback& write);
     Response Download(std::ofstream& file);
+    Response Download(const std::string& local_filepath);
     Response Get();
     Response Head();
     Response Options();
@@ -171,6 +172,10 @@ class Session : public std::enable_shared_from_this<Session> {
     Response FtpPut(const std::string& local_filepath);
     Response FtpListFile(const std::string& filepath);
 
+#ifdef WIN32
+    std::string AnsiToUtf8(const std::string& codepage_str);
+    std::wstring Utf8ToUtf16(const std::string& str);
+#endif
     AsyncResponse GetAsync();
     AsyncResponse DeleteAsync();
     AsyncResponse DownloadAsync(const WriteCallback& write);

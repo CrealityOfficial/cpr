@@ -690,6 +690,39 @@ Response Session::Download(std::ofstream& file) {
     return makeDownloadRequest();
 }
 
+Response Session::Download(const std::string& local_filepath) {
+
+    FILE* hd_src;
+    //struct stat file_info;
+    unsigned long fsize;
+
+    std::wstring srcName;
+#ifdef WIN32
+    srcName = Utf8ToUtf16(local_filepath);
+    _wfopen_s(&hd_src, srcName.c_str(), L"wb");
+#else
+    hd_src = fopen(local_filepath.c_str(), "wb");
+#endif
+
+    struct curl_slist* headerlist = NULL;
+
+
+    if (!hd_src)
+    {
+        return Response();
+    }
+
+    curl_easy_setopt(curl_->handle, CURLOPT_NOBODY, 0L);
+    curl_easy_setopt(curl_->handle, CURLOPT_HTTPGET, 1);
+    curl_easy_setopt(curl_->handle, CURLOPT_WRITEFUNCTION, cpr::util::writeCFileFunction);
+    curl_easy_setopt(curl_->handle, CURLOPT_WRITEDATA, hd_src);
+    curl_easy_setopt(curl_->handle, CURLOPT_CUSTOMREQUEST, nullptr);
+
+    Response ret = makeDownloadRequest();
+    fclose(hd_src);
+    return ret;
+}
+
 Response Session::Get() {
     PrepareGet();
     return makeRequest();
@@ -721,7 +754,7 @@ Response Session::Put() {
 }
 
 #ifdef WIN32
-std::string AnsiToUtf8(const std::string& codepage_str) {
+std::string Session::AnsiToUtf8(const std::string& codepage_str) {
     // Transcode Windows ANSI to UTF-16
     int size = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, codepage_str.c_str(), codepage_str.length(), nullptr, 0);
     std::wstring utf16_str(size, '\0');
@@ -735,7 +768,7 @@ std::string AnsiToUtf8(const std::string& codepage_str) {
     return utf8_str;
 }
 
-std::wstring Utf8ToUtf16(const std::string& str) {
+std::wstring Session::Utf8ToUtf16(const std::string& str) {
     std::wstring ret;
     int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
     if (len > 0) {

@@ -140,6 +140,12 @@ size_t writeFileFunction(char* ptr, size_t size, size_t nmemb, std::ofstream* fi
     return size;
 }
 
+size_t writeCFileFunction(char* ptr, size_t size, size_t nmemb, FILE* file) {
+    size *= nmemb;
+    fwrite(ptr, 1, size, file);
+    return size;
+}
+
 size_t writeUserFunction(char* ptr, size_t size, size_t nmemb, const WriteCallback* write) {
     size *= nmemb;
     return (*write)({ptr, size}) ? size : 0;

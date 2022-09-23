@@ -19,6 +19,7 @@ size_t readUserFunction(char* ptr, size_t size, size_t nitems, const ReadCallbac
 size_t headerUserFunction(char* ptr, size_t size, size_t nmemb, const HeaderCallback* header);
 size_t writeFunction(char* ptr, size_t size, size_t nmemb, std::string* data);
 size_t writeFileFunction(char* ptr, size_t size, size_t nmemb, std::ofstream* file);
+size_t writeCFileFunction(char* ptr, size_t size, size_t nmemb, FILE* file);
 size_t writeUserFunction(char* ptr, size_t size, size_t nmemb, const WriteCallback* write);
 #if LIBCURL_VERSION_NUM < 0x072000
 int progressUserFunction(const ProgressCallback* progress, double dltotal, double dlnow, double ultotal, double ulnow);

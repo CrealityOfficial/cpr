@@ -255,6 +255,13 @@ Response Download(std::ofstream& file, Ts&&... ts) {
     return session.Download(file);
 }
 
+template <typename... Ts>
+Response Download(const std::string& file, Ts&&... ts) {
+    Session session;
+    priv::set_option(session, std::forward<Ts>(ts)...);
+    return session.Download(file);
+}
+
 // Download async method
 template <typename... Ts>
 AsyncResponse DownloadAsync(std::string local_path, Ts... ts) {

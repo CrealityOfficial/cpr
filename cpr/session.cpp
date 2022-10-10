@@ -832,7 +832,7 @@ Response Session::FtpPut(const std::string& local_filepath) {
 Response Session::FtpListFile(const std::string& filepath) {
 
     curl_easy_setopt(curl_->handle, CURLOPT_URL, filepath.c_str());
-    curl_easy_setopt(curl_->handle, CURLOPT_DIRLISTONLY, 1L);
+    //curl_easy_setopt(curl_->handle, CURLOPT_DIRLISTONLY, 1L);
 
     CURLcode curl_error = curl_easy_perform(curl_->handle);
     return Complete(curl_error);

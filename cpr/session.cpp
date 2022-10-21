@@ -837,6 +837,15 @@ Response Session::FtpListFile(const std::string& filepath) {
     CURLcode curl_error = curl_easy_perform(curl_->handle);
     return Complete(curl_error);
 }
+
+Response Session::FtpGet(const std::string& range) {
+
+    curl_easy_setopt(curl_->handle, CURLOPT_URL, url_.str().c_str());
+    curl_easy_setopt(curl_->handle, CURLOPT_RANGE, range.c_str());
+    CURLcode curl_error = curl_easy_perform(curl_->handle);
+    return Complete(curl_error);
+}
+
 std::shared_ptr<Session> Session::GetSharedPtrFromThis() {
     try {
         return shared_from_this();

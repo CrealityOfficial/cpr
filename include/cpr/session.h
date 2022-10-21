@@ -171,6 +171,7 @@ class Session : public std::enable_shared_from_this<Session> {
     Response Put();
     Response FtpPut(const std::string& local_filepath);
     Response FtpListFile(const std::string& filepath);
+    Response FtpGet(const std::string& range);
 
 #ifdef WIN32
     std::string AnsiToUtf8(const std::string& codepage_str);

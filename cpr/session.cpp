@@ -839,10 +839,23 @@ Response Session::FtpListFile(const std::string& filepath) {
 }
 
 Response Session::FtpGet(const std::string& range) {
-
     curl_easy_setopt(curl_->handle, CURLOPT_URL, url_.str().c_str());
     curl_easy_setopt(curl_->handle, CURLOPT_RANGE, range.c_str());
     CURLcode curl_error = curl_easy_perform(curl_->handle);
+    return Complete(curl_error);
+}
+
+Response Session::FtpDelete(const std::string& filepath)
+{
+    struct curl_slist* headerlist = NULL;
+    auto index = filepath.find_last_of('/');
+    std::string strRemoteFile = filepath.substr(index + 1);
+    std::string buf = "DELE " + (strRemoteFile);
+    headerlist = curl_slist_append(headerlist, buf.c_str());
+    curl_easy_setopt(curl_->handle, CURLOPT_URL, filepath.substr(0, index+1).c_str());
+    curl_easy_setopt(curl_->handle, CURLOPT_POSTQUOTE, headerlist);
+    CURLcode curl_error = curl_easy_perform(curl_->handle);
+    curl_slist_free_all(headerlist);
     return Complete(curl_error);
 }
 

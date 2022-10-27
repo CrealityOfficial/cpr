@@ -110,6 +110,20 @@ auto FtpGetCallback(const std::string& range, Then then, Ts... ts) {
     return cpr::async([=](Then then_inner, Ts... ts_inner) { return then_inner(FtpGet(range, std::move(ts_inner)...)); }, std::move(then), std::move(ts)...);
 }
 
+// FTP Delete methods
+template <typename... Ts>
+Response FtpDelete(const std::string& filepath, Ts&&... ts) {
+    Session session;
+    priv::set_option(session, std::forward<Ts>(ts)...);
+    return session.FtpDelete(filepath);
+}
+
+// FTP Delete async methods
+template <typename... Ts>
+AsyncResponse FtpDeleteAsync(const std::string& filepath, Ts... ts) {
+    return cpr::async([=](Ts... ts_inner) { return FtpDelete(filepath, std::move(ts_inner)...); }, std::move(ts)...);
+}
+
 // Get async methods
 template <typename... Ts>
 AsyncResponse GetAsync(Ts... ts) {

@@ -694,7 +694,7 @@ Response Session::Download(const std::string& local_filepath) {
 
     FILE* hd_src;
     //struct stat file_info;
-    unsigned long fsize;
+    //unsigned long fsize;
 
     std::wstring srcName;
 #ifdef WIN32
@@ -704,7 +704,7 @@ Response Session::Download(const std::string& local_filepath) {
     hd_src = fopen(local_filepath.c_str(), "wb");
 #endif
 
-    struct curl_slist* headerlist = NULL;
+    //struct curl_slist* headerlist = NULL;
 
 
     if (!hd_src)

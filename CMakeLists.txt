@@ -115,6 +115,9 @@ endif()
 #    add_compile_definitions(OPENSSL_BACKEND_USED)
 #endif()
 
+__cc_find(curl)
+__cc_find(zlib)
+
 __assert_target(curl)
 __assert_target(zlib)
 
@@ -198,3 +201,8 @@ __add_real_target(cpr dll SOURCE ${SRCS}
 						  LIB ${LIBS}
 						  INTERFACE ${INCS}
 						  )
+						  
+if(CC_INSTALL_CPR)
+	__install_directory_specif(${CMAKE_CURRENT_SOURCE_DIR}/include/ cpr)
+	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/cpr/cprver.h DESTINATION cpr)
+endif()

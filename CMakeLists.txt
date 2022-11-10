@@ -204,5 +204,5 @@ __add_real_target(cpr dll SOURCE ${SRCS}
 						  
 if(CC_INSTALL_CPR)
 	__install_directory_specif(${CMAKE_CURRENT_SOURCE_DIR}/include/ cpr)
-	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/cpr/cprver.h DESTINATION cpr)
+	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/cpr/cprver.h DESTINATION include/cpr/)
 endif()

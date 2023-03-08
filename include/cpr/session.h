@@ -169,7 +169,7 @@ class Session : public std::enable_shared_from_this<Session> {
     Response Patch();
     Response Post();
     Response Put();
-    Response FtpPut(const std::string& local_filepath);
+    Response FtpPut(const std::string& local_filename, const std::string& local_filepath);
     Response FtpListFile(const std::string& filepath);
     Response FtpGet(const std::string& range);
     Response FtpDelete(const std::string& filepath);

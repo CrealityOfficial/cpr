@@ -62,23 +62,23 @@ Response Get(Ts&&... ts) {
 
 // FTP Put methods
 template <typename... Ts>
-Response FtpPut(const std::string& local_filepath, Ts&&... ts) {
+Response FtpPut(const std::string& filename, const std::string& filepath, Ts&&... ts) {
     Session session;
     priv::set_option(session, std::forward<Ts>(ts)...);
-    return session.FtpPut(local_filepath);
+    return session.FtpPut(filename, filepath);
 }
 
 // FTP Put async methods
 template <typename... Ts>
-AsyncResponse FtpPutAsync(const std::string& filepath, Ts... ts) {
-    return cpr::async([=](Ts... ts_inner) { return FtpPut(filepath, std::move(ts_inner)...); }, std::move(ts)...);
+AsyncResponse FtpPutAsync(const std::string& filename, const std::string& filepath, Ts... ts) {
+    return cpr::async([=](Ts... ts_inner) { return FtpPut(filename, filepath, std::move(ts_inner)...); }, std::move(ts)...);
 }
 
 // FTP Put callback methods
 template <typename Then, typename... Ts>
 // NOLINTNEXTLINE(fuchsia-trailing-return)
-auto FtpPutCallback(const std::string& filepath, Then then, Ts... ts) {
-    return cpr::async([=](Then then_inner, Ts... ts_inner) { return then_inner(FtpPut(filepath, std::move(ts_inner)...)); }, std::move(then), std::move(ts)...);
+auto FtpPutCallback(const std::string& filename, const std::string& filepath, Then then, Ts... ts) {
+    return cpr::async([=](Then then_inner, Ts... ts_inner) { return then_inner(FtpPut(filename, filepath, std::move(ts_inner)...)); }, std::move(then), std::move(ts)...);
 }
 
 // FTP List methods

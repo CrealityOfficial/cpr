@@ -803,12 +803,15 @@ Response Session::FtpPut(const std::string& local_filename, const std::string& l
     fsize = (long)ftell(hd_src);
     fseek(hd_src, 0, SEEK_SET);
     //fs::path local_path(local_filepath);
-    //std::string strRemoteFile = "";
-    //auto index = local_filepath.find_last_of('/');
-    //strRemoteFile = local_filepath.substr(index+1);
-    std::string tempName = (local_filename + ".temp");
+    std::string strRemoteFile = local_filename;
+    if (strRemoteFile.empty())
+    {
+        auto index = local_filepath.find_last_of('/');
+        strRemoteFile = local_filepath.substr(index + 1);
+    }
+    std::string tempName = (strRemoteFile + ".temp");
     std::string buf_1 = "RNFR " + (tempName);
-    std::string buf_2 = "RNTO " + (local_filename);
+    std::string buf_2 = "RNTO " + (strRemoteFile);
     std::string url = url_.str() + tempName;
     /* build a list of commands to pass to libcurl */
     headerlist = curl_slist_append(headerlist, buf_1.c_str());

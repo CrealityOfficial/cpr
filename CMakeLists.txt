@@ -116,10 +116,10 @@ endif()
 #endif()
 
 __cc_find(curl)
-__cc_find(zlib)
+__cc_find(zlib_static)
 
 __assert_target(curl)
-__assert_target(zlib)
+__assert_target(zlib_static)
 
 set(SRCS 
         cpr/accept_encoding.cpp
@@ -188,7 +188,7 @@ set(SRCS
 		)
 		
 set(INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
-set(LIBS curl zlib)
+set(LIBS curl zlib_static)
 set(DEFS)
 
 if(TARGET ssl)

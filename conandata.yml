@@ -5,5 +5,5 @@ repository: http://172.20.180.12:8050/yanfa4/thirdpary/cpr
 external_repository: https://github.com/CrealityOfficial/cpr
 description: cpr
 topics: cpr,compression,zip
-build_deps: curl/0.0.2,zlib_static/1.0.0
-search_deps: curl/0.0.2
+build_deps: curl_static/1.0.0,zlib_static/1.0.0
+search_deps: curl_static/1.0.0,zlib_static/1.0.0

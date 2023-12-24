@@ -115,11 +115,11 @@ endif()
 #    add_compile_definitions(OPENSSL_BACKEND_USED)
 #endif()
 
-__cc_find(curl)
-__cc_find(zlib)
+__cc_find(curl_static)
+__cc_find(zlib_static)
 
-__assert_target(curl)
-__assert_target(zlib)
+__assert_target(curl_static)
+__assert_target(zlib_static)
 
 set(SRCS 
         cpr/accept_encoding.cpp
@@ -188,21 +188,21 @@ set(SRCS
 		)
 		
 set(INCS ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
-set(LIBS curl zlib)
+set(ILIBS curl_static zlib_static)
 set(DEFS)
 
 if(TARGET ssl)
-    list(APPEND LIBS ssl)
+    list(APPEND ILIBS ssl)
     list(APPEND DEFS OPENSSL_BACKEND_USED)
 endif()
 
-__add_real_target(cpr dll SOURCE ${SRCS}
+__add_real_target(cpr_static lib SOURCE ${SRCS}
 						  INC ${INCS}
-						  LIB ${LIBS}
+						  ILIB ${ILIBS}
 						  INTERFACE ${INCS}
 						  )
 						  
-if(CC_INSTALL_CPR)
+if(CC_INSTALL_CPR_STATIC)
 	__install_directory_specif(${CMAKE_CURRENT_SOURCE_DIR}/include/ cpr)
 	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/cpr/cprver.h DESTINATION include/cpr/)
 endif()
